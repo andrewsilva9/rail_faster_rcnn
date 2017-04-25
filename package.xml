@@ -1,5 +1,5 @@
 <package>
-  <name>ros-faster-rcnn</name>
+  <name>ros_faster_rcnn</name>
   <version>0.0.1</version>
   <description>
     This package provides object detection via Faster RCNN.

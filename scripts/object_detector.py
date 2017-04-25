@@ -4,26 +4,22 @@
 Object Detector Object for ROS
 """
 
-import _init_paths
-from fast_rcnn.config import cfg
-from fast_rcnn.test import im_detect
-from fast_rcnn.nms_wrapper import nms
+from lib.fast_rcnn.config import cfg
+from lib.fast_rcnn.test import im_detect
+from lib.fast_rcnn.nms_wrapper import nms
 import numpy as np
 import scipy.io as sio
 import caffe, os, sys, cv2
 import argparse
-os.environ['GLOG_minloglevel'] = '2'
-
-import caffe
+# os.environ['GLOG_minloglevel'] = '2'
 
 
 class RCNNDetector:
     def __init__(self):
         cfg.TEST.HAS_RPN = True  # Use RPN for proposals
 
-        prototxt = os.path.join(cfg.MODELS_DIR, 'coco_blocks',
-                                'faster_rcnn_alt_opt', 'faster_rcnn_test.pt')
-        caffemodel = os.path.join(cfg.DATA_DIR, 'faster_rcnn_models', 'coco_blocks_faster_rcnn_final.caffemodel')
+        prototxt = '/home/andrewsilva/faster_rcnn/py-faster-rcnn/models/coco_blocks/faster_rcnn_alt_opt/faster_rcnn_test.pt'
+        caffemodel = '/home/andrewsilva/faster_rcnn/py-faster-rcnn/output/default/train/coco_blocks_faster_rcnn_final.caffemodel'
 
         if not os.path.isfile(caffemodel):
             raise IOError(('{:s} not found.\nDid you run ./data/script/'
@@ -34,8 +30,6 @@ class RCNNDetector:
                    'bowl', 'banana', 'apple', 'orange', 'pizza', 'donut',
                    'tv', 'laptop', 'cell phone', 'book', 'screw', 'block', 'beam']
 
-        self.my_model_dir = '/home/andrewsilva/faster_rcnn/py-faster-rcnn/models'
-        self.my_output_dir = '/home/andrewsilva/faster_rcnn/py-faster-rcnn/output/default/train'
         caffe.set_mode_gpu()
         caffe.set_device(0)
         cfg.GPU_ID = 0
@@ -53,7 +47,7 @@ class RCNNDetector:
         scores, boxes = im_detect(self.net, input_image)
         # Visualize detections for each class
         objects_detected = []
-        CONF_THRESH = 0.8
+        CONF_THRESH = 0.75
         NMS_THRESH = 0.3
         for cls_ind, cls in enumerate(self.class_list[1:]):
             cls_ind += 1  # because we skipped background
