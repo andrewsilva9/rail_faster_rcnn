@@ -84,20 +84,20 @@ class RCNNDetector(object):
         img2 = image_cv[down_shift:bottom_img, right_table_shift:right_table_shift + table_width, :]
 
         # Detect all object classes and regress object bounds
-        timer = Timer()
-        timer.tic()
+        # timer = Timer()
+        # timer.tic()
         self.objects1 = self.detector.find_objects(img2)
-        timer.toc()
-        print ('Detection took {:.3f}s for '
-               '{:d} object proposals').format(timer.total_time, len(self.objects1))
+        # timer.toc()
+        # print ('Detection took {:.3f}s for '
+        #        '{:d} object proposals').format(timer.total_time, len(self.objects1))
 
         img3 = image_cv[down_shift:bottom_img, left_shift:left_shift + table_width, :]
-        timer = Timer()
-        timer.tic()
+        # timer = Timer()
+        # timer.tic()
         self.objects2 = self.detector.find_objects(img3)
-        timer.toc()
-        print ('Detection took {:.3f}s for '
-               '{:d} object proposals').format(timer.total_time, len(self.objects2))
+        # timer.toc()
+        # print ('Detection took {:.3f}s for '
+        #        '{:d} object proposals').format(timer.total_time, len(self.objects2))
         self.objects = self.objects1 + self.objects2
         #### DEBUG ####
         if self.debug:

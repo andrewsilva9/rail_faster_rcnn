@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ros_faster_rcnn)
+project(rail_faster_rcnn)
 
 find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
