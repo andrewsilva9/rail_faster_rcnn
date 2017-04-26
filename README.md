@@ -1,4 +1,4 @@
-# ros-faster-rcnn
+# rail-faster-rcnn
 ROS bridge to py-faster-rcnn
 
 ### Caffe Changes:
@@ -19,4 +19,7 @@ export PYTHONPATH=~/caffe/python/caffe/layers:$PYTHONPATH
 ```
 7) Get the .caffemodel and .prototxt files from me
 8) Edit lines 21 - 22 to point to the .caffemodel and .prototxt files
-9) Run!
+9) Run! Sample command below, pointing to /kinect/hd and turning on the debug images. Note that if you are using /kinect/qhd or another small image, the OpenCV image crops may go out of bounds and crash...
+```
+roslaunch rail_faster_rcnn detector.launch image_sub_topic_name:=/kinect/hd/image_color_rect debug:=true
+```
