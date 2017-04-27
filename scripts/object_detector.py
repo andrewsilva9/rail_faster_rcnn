@@ -49,7 +49,7 @@ class RCNNDetector:
         objects_detected = []
         CONF_THRESH = 0.75
         NMS_THRESH = 0.3
-        for cls_ind, cls in enumerate(self.class_list[1:]):
+        for cls_ind, cls in enumerate(self.class_list[1:]): # TODO change to self.class_list[-3:]
             cls_ind += 1  # because we skipped background
             cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
             cls_scores = scores[:, cls_ind]

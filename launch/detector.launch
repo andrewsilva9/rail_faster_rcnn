@@ -2,7 +2,7 @@
 	<arg name="image_sub_topic_name" default="/kinect/hd/image_color_rect" />
 	<arg name="debug" default="false" />
 
-	<node pkg="ros_faster_rcnn" type="rcnn_detector_node.py" name="rcnn_detector_node" output="screen">
+	<node pkg="rail_faster_rcnn" type="rcnn_detector_node.py" name="rcnn_detector_node" output="screen">
 		<param name="image_sub_topic_name" type="string" value="$(arg image_sub_topic_name)" />
 		<param name="debug" type="bool" value="$(arg debug)" />
 	</node>

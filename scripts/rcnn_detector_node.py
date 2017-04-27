@@ -10,7 +10,7 @@ import rospy
 from lib.utils.timer import Timer
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
-from ros_faster_rcnn.msg import Object, Detections
+from rail_faster_rcnn.msg import Object, Detections
 
 import object_detector
 
