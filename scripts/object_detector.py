@@ -8,6 +8,7 @@ from lib.fast_rcnn.config import cfg
 from lib.fast_rcnn.test import im_detect
 from lib.fast_rcnn.nms_wrapper import nms
 import numpy as np
+import time
 import scipy.io as sio
 import caffe, os, sys, cv2
 import argparse
@@ -44,12 +45,16 @@ class RCNNDetector:
 
     def find_objects(self, input_image):
         # input_image = input_image.astype(float)
+        start_time = time.time()
+        caffe.set_mode_gpu()
+        caffe.set_device(0)
         scores, boxes = im_detect(self.net, input_image)
+        print 'CNN took: ', time.time() - start_time
         # Visualize detections for each class
         objects_detected = []
         CONF_THRESH = 0.75
         NMS_THRESH = 0.3
-        for cls_ind, cls in enumerate(self.class_list[1:]): # TODO change to self.class_list[-3:]
+        for cls_ind, cls in enumerate(self.class_list[-3:]): # TODO change to self.class_list[-3:]
             cls_ind += 1  # because we skipped background
             cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
             cls_scores = scores[:, cls_ind]
