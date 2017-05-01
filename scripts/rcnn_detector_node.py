@@ -110,20 +110,9 @@ class RCNNDetector(object):
         # print ('Detection took {:.3f}s for '
         #        '{:d} object proposals').format(timer.total_time, len(self.objects2))
         self.objects = left_objects + right_objects
-        ### TODO:
-        ### PROBLEM: bounding boxes are coming back relative to their crops. after returned, they need to be changed
-        ### such that they make sense in the larger image
-        ### SO when self.objects1 comes back, add right_shift to all xs and down_shift to all ys
-        ### Do the same for self.objects2 when it comes back (but left_shift instead of right)
-        ### TODO:
-        ### PROBLEM: bounding boxes are coming back as a list of lists. after returned, they need to be pulled out so that
-        ### they can be iterated over as boxes, not as lists of boxes [ [box1], [box2], [box3] ], instead of [[[box1],[box2],[box3]], [[box1], [box2]]]
-        #### DEBUG ####
+
         if self.debug:
-            print "DEBUGGING object list: ", self.objects
             for obj in self.objects:
-                print 'SINGLE OBJECT:', obj
-                # obj = obj[0]
                 x1 = int(obj[0])
                 y1 = int(obj[1])
                 width = int(obj[2])
@@ -150,14 +139,12 @@ class RCNNDetector(object):
         for bbox_obj in self.objects:
             if len(bbox_obj) < 1:
                 continue
-            # bbox_obj = bbox_obj[0]
-            # rospy.loginfo("BBox Obj" + str(bbox_obj))
             msg = Object()
             msg.object_id = bbox_obj[4]
             msg.top_left_x = int(bbox_obj[0])
             msg.top_left_y = int(bbox_obj[1])
-            msg.bot_right_x = int(bbox_obj[2])
-            msg.bot_right_y = int(bbox_obj[3])
+            msg.bot_right_x = int(bbox_obj[2]) + int(bbox_obj[0])
+            msg.bot_right_y = int(bbox_obj[3]) + int(bbox_obj[1])
             obj_arr.objects.append(msg)
         # for bbox_obj in self.objects2:
         #     if len(bbox_obj) < 1:
