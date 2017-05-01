@@ -84,33 +84,50 @@ class RCNNDetector(object):
         img2 = image_cv[down_shift:bottom_img, right_table_shift:right_table_shift + table_width, :]
 
         # Detect all object classes and regress object bounds
-        # timer = Timer()
-        # timer.tic()
-        self.objects1 = self.detector.find_objects(img2)
-        # timer.toc()
-        # print ('Detection took {:.3f}s for '
-        #        '{:d} object proposals').format(timer.total_time, len(self.objects1))
+        right_objects = []
+        objects_back = self.detector.find_objects(img2)
+        for obj_list in objects_back:
+            for obj in obj_list:
+                adjusted_x1 = obj[0] + right_table_shift
+                adjusted_y1 = obj[1] + down_shift
+                width = obj[2] - obj[0]
+                height = obj[3] - obj[1]
+                cls = obj[4]
+                right_objects.append([adjusted_x1, adjusted_y1, width, height, cls])
 
         img3 = image_cv[down_shift:bottom_img, left_shift:left_shift + table_width, :]
-        # timer = Timer()
-        # timer.tic()
-        self.objects2 = self.detector.find_objects(img3)
+        left_objects = []
+        objects_back = self.detector.find_objects(img3)
+        for obj_list in objects_back:
+            for obj in obj_list:
+                adjusted_x1 = obj[0] + left_shift
+                adjusted_y1 = obj[1] + down_shift
+                width = obj[2] - obj[0]
+                height = obj[3] - obj[1]
+                cls = obj[4]
+                left_objects.append([adjusted_x1, adjusted_y1, width, height, cls])
         # timer.toc()
         # print ('Detection took {:.3f}s for '
         #        '{:d} object proposals').format(timer.total_time, len(self.objects2))
-        self.objects = self.objects1 + self.objects2
+        self.objects = left_objects + right_objects
+        ### TODO:
+        ### PROBLEM: bounding boxes are coming back relative to their crops. after returned, they need to be changed
+        ### such that they make sense in the larger image
+        ### SO when self.objects1 comes back, add right_shift to all xs and down_shift to all ys
+        ### Do the same for self.objects2 when it comes back (but left_shift instead of right)
+        ### TODO:
+        ### PROBLEM: bounding boxes are coming back as a list of lists. after returned, they need to be pulled out so that
+        ### they can be iterated over as boxes, not as lists of boxes [ [box1], [box2], [box3] ], instead of [[[box1],[box2],[box3]], [[box1], [box2]]]
         #### DEBUG ####
         if self.debug:
+            print "DEBUGGING object list: ", self.objects
             for obj in self.objects:
-                if len(obj) < 1:
-                    continue
-                obj = obj[0]
+                print 'SINGLE OBJECT:', obj
+                # obj = obj[0]
                 x1 = int(obj[0])
                 y1 = int(obj[1])
-                width = int(obj[2]) - x1
-                height = int(obj[3]) - y1
-                x1 += right_table_shift
-                y1 += down_shift
+                width = int(obj[2])
+                height = int(obj[3])
                 image_cv = self._draw_bb(image_cv, {'x': x1,
                                                     'y': y1,
                                                     'w': width,
@@ -133,8 +150,8 @@ class RCNNDetector(object):
         for bbox_obj in self.objects:
             if len(bbox_obj) < 1:
                 continue
-            bbox_obj = bbox_obj[0]
-            rospy.loginfo("BBox Obj" + str(bbox_obj))
+            # bbox_obj = bbox_obj[0]
+            # rospy.loginfo("BBox Obj" + str(bbox_obj))
             msg = Object()
             msg.object_id = bbox_obj[4]
             msg.top_left_x = int(bbox_obj[0])

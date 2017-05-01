@@ -45,17 +45,17 @@ class RCNNDetector:
 
     def find_objects(self, input_image):
         # input_image = input_image.astype(float)
-        start_time = time.time()
+        # start_time = time.time()
         caffe.set_mode_gpu()
         caffe.set_device(0)
         scores, boxes = im_detect(self.net, input_image)
-        print 'CNN took: ', time.time() - start_time
+        # print 'CNN took: ', time.time() - start_time
         # Visualize detections for each class
         objects_detected = []
-        CONF_THRESH = 0.75
+        CONF_THRESH = 0.65
         NMS_THRESH = 0.3
-        for cls_ind, cls in enumerate(self.class_list[-3:]): # TODO change to self.class_list[-3:]
-            cls_ind += 1  # because we skipped background
+        for cls_ind, cls in enumerate(self.class_list[15:]): # TODO change to self.class_list[-3:]
+            cls_ind += 15  # because we skipped background
             cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
             cls_scores = scores[:, cls_ind]
             dets = np.hstack((cls_boxes,
