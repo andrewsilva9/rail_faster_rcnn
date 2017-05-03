@@ -52,8 +52,18 @@ class RCNNDetector:
         # print 'CNN took: ', time.time() - start_time
         # Visualize detections for each class
         objects_detected = []
-        CONF_THRESH = 0.65
-        NMS_THRESH = 0.3
+        CONF_THRESH = 0.7
+        NMS_THRESH = 0.2
+        class_index = 11
+        class_name = 'tv'
+        class_boxes = boxes[:, 4*class_index:4*(class_index+1)]
+        class_scores = scores[:, class_index]
+        detections = np.hstack((class_boxes, class_scores[:, np.newaxis])).astype(np.float32)
+        keepers = nms(detections, NMS_THRESH)
+        detections = detections[keepers, :]
+        detections = detections[detections[:, -1] >= CONF_THRESH]
+        detections[:, -1] = 3 # TODO: Hack so that TV returns as 3 which is tablet in the filter...
+        objects_detected.append(detections)
         for cls_ind, cls in enumerate(self.class_list[15:]):
             cls_ind += 15  # because we skipped background
             cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
@@ -63,7 +73,7 @@ class RCNNDetector:
             keep = nms(dets, NMS_THRESH)
             dets = dets[keep, :]
             dets = dets[dets[:, -1] >= CONF_THRESH]
-            dets[:, -1] = cls_ind
+            dets[:, -1] = 2 # TODO: Hack so that all blocks have object ID 2
             # append data structure with format [[x1, y1, x2, y2, obj_id], [x1, y1, x2, y2, obj_id], ...] for all boxes
             objects_detected.append(dets)
         return objects_detected
