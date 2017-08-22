@@ -75,41 +75,29 @@ class RCNNDetector(object):
         except CvBridgeError as e:
             print e
             return
-        down_shift = int(len(image_cv) / 3) + 200
-        bottom_img = int(len(image_cv) - 200)
-        right_table_shift = int(len(image_cv[0]) / 2 + 125)
-        left_shift = 190
-        table_width = 550
+        down_shift = int(len(image_cv)*.527)
+        bottom_img = down_shift+230
+        table_shift = int(len(image_cv[0])*.455)
+        table_end = table_shift+726
         # Test on the right table hd crop
-        img2 = image_cv[down_shift:bottom_img, right_table_shift:right_table_shift + table_width, :]
+        img2 = image_cv[down_shift:bottom_img, table_shift:table_end, :]
 
         # Detect all object classes and regress object bounds
         right_objects = []
         objects_back = self.detector.find_objects(img2)
         for obj_list in objects_back:
             for obj in obj_list:
-                adjusted_x1 = obj[0] + right_table_shift
+                adjusted_x1 = obj[0] + table_shift
                 adjusted_y1 = obj[1] + down_shift
                 width = obj[2] - obj[0]
                 height = obj[3] - obj[1]
                 cls = obj[4]
                 right_objects.append([adjusted_x1, adjusted_y1, width, height, cls])
 
-        img3 = image_cv[down_shift:bottom_img, left_shift:left_shift + table_width, :]
-        left_objects = []
-        objects_back = self.detector.find_objects(img3)
-        for obj_list in objects_back:
-            for obj in obj_list:
-                adjusted_x1 = obj[0] + left_shift
-                adjusted_y1 = obj[1] + down_shift
-                width = obj[2] - obj[0]
-                height = obj[3] - obj[1]
-                cls = obj[4]
-                left_objects.append([adjusted_x1, adjusted_y1, width, height, cls])
         # timer.toc()
         # print ('Detection took {:.3f}s for '
         #        '{:d} object proposals').format(timer.total_time, len(self.objects2))
-        self.objects = left_objects + right_objects
+        self.objects = right_objects
 
         if self.debug:
             for obj in self.objects:
@@ -146,18 +134,6 @@ class RCNNDetector(object):
             msg.bot_right_x = int(bbox_obj[2]) + int(bbox_obj[0])
             msg.bot_right_y = int(bbox_obj[3]) + int(bbox_obj[1])
             obj_arr.objects.append(msg)
-        # for bbox_obj in self.objects2:
-        #     if len(bbox_obj) < 1:
-        #         continue
-        #     bbox_obj = bbox_obj[0]
-        #     rospy.loginfo("BBox Obj" + str(bbox_obj))
-        #     msg = Object()
-        #     msg.object_id = bbox_obj[4]
-        #     msg.top_left_x = int(bbox_obj[0])
-        #     msg.top_left_y = int(bbox_obj[1])
-        #     msg.bot_right_x = int(bbox_obj[2])
-        #     msg.bot_right_y = int(bbox_obj[3])
-        #     obj_arr.objects.append(msg)
 
         self.object_pub.publish(obj_arr)
 
